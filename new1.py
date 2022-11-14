@@ -51,24 +51,24 @@ def main():
 			predict = KF.predict()
 
 			# Draw a rectangle as the predicted object position
-			#cv2.rectangle(frame, (int(predicted[0][0]), int(predicted[0][1])), (255, 0, 0), 15)
+			# cv2.rectangle(frame, (int(predicted[0][0]), int(predicted[0][1])), (255, 0, 0), 15)
 			# print (cx)
 			# print (cy)
 			# KF = KalmanFilter(0.1, int(cx), int(cy) ,1, 0.1, 0.1)
 
 			# Update
-			# update = KF.update(center[0])
+			update = KF.update(predict)
 			# print(center[0])
 
 			# Draw a rectangle as the estimated object position
-			#cv2.rectangle(frame, (int(update[0]), int(update[0])), (0, 0, 255), 15)
+			# cv2.rectangle(frame, (int(update[0]), int(update[0])), (0, 0, 255), 15)
 
 			print("Measured Position: ", (int(center[0][0]), int(center[0][1])))
 			#cv2.putText(frame, "Estimated Position", (int(x1 + 15), int(y1 + 10)), 0, 0.5, (0, 0, 255), 2)
-			# print("Estimated Position: ", int(update[0]), int(update[1]))
-			#cv2.putText(frame, "Predicted Position", (int(x + 15), int(y)), 0, 0.5, (255, 0, 0), 2)
 			print("Predicted Position: ", int(predict[0]), int(predict[1]))
 			#cv2.putText(frame, "Measured Position", (int(centers[0][0] + 15), int(centers[0][1] - 15)), 0, 0.5, (0,191,255), 2)
+			print("Estimated Position: ", int(update[0]), int(update[1]))
+			#cv2.putText(frame, "Predicted Position", (int(x + 15), int(y)), 0, 0.5, (255, 0, 0), 2)
 		
 		imgResize = cv2.resize(frame, (0, 0), None, 0.3, 0.3)
 		cv2.imshow('image', imgResize)
