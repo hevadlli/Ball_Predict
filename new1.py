@@ -7,7 +7,7 @@ import imutils
 def main():
 
 	# Create opencv video capture object
-	VideoCap = cv2.VideoCapture(0)
+	VideoCap = cv2.VideoCapture("Video/vid (20).mp4")
 
 	#Variable used to control the speed of reading the video
 	ControlSpeedVar = 10 #Lowest: 1 - Highest:100
@@ -30,12 +30,23 @@ def main():
 		contours = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 		contours = imutils.grab_contours(contours)
 		center=[]
+		xPrev = 0;
+		yPrev = 0;
 		for c in contours:
 			M = cv2.moments(c)
 			if M['m00'] != 0:
 				cx = int(M['m10'] / M['m00'])
 				cy = int(M['m01'] / M['m00'])
 				center.append(np.array([[cx], [cy]]))
+
+				sX = (cx - xPrev)
+				xPrev = cx
+
+				sY = (cy - yPrev)
+				yPrev = cy
+				print("sX",sX,"sY",sY)
+				print("..", xPrev,"..",yPrev)
+
 
 			# else:
 			# 	cx, cy = 0,0
@@ -45,13 +56,23 @@ def main():
 
 			# Draw the detected circle
 			cv2.circle(frame, (int(center[0][0]), int(center[0][1])), 10, (0, 191, 255), 15)
-			KF = KalmanFilter(0.1, int(center[0][0]), int(center[0][1]), 1, 0.1, 0.1)
+			
+			for i in range (50):
+				KF = KalmanFilter(0.1, int(center[0][0]), int(center[0][1]),sX, sY, 1, 0.1, 0.1)
+				predict = KF.predict()
+				center[0][0] = predict[0]
+				center[0][1] = predict[1] 
+				cv2.circle(frame, (int(predict[0]), int(predict[1])),10, (255, 0, 0), 15)
+				print("Measured Position: ", (int(center[0][0]), int(center[0][1])))
+				#cv2.putText(frame, "Estimated Position", (int(x1 + 15), int(y1 + 10)), 0, 0.5, (0, 0, 255), 2)
+				print("Predicted Position: ", int(predict[0]), int(predict[1]))
+				#cv2.putText(frame, "Measured Position", (int(centers[0][0] + 15), int(centers[0][1] - 15)), 0, 0.5, (0,191,255), 2)
+				
 
-			# Predict
-			predict = KF.predict()
+			# Predic	
 
 			# Draw a rectangle as the predicted object position
-			# cv2.rectangle(frame, (int(predicted[0][0]), int(predicted[0][1])), (255, 0, 0), 15)
+			
 			# print (cx)
 			# print (cy)
 			# KF = KalmanFilter(0.1, int(cx), int(cy) ,1, 0.1, 0.1)
@@ -61,16 +82,12 @@ def main():
 			# print(center[0])
 
 			# Draw a rectangle as the estimated object position
-			# cv2.rectangle(frame, (int(update[0]), int(update[0])), (0, 0, 255), 15)
+			cv2.circle(frame, (int(update[0]), int(update[1])),10, (0, 0, 255), 15)
 
-			print("Measured Position: ", (int(center[0][0]), int(center[0][1])))
-			#cv2.putText(frame, "Estimated Position", (int(x1 + 15), int(y1 + 10)), 0, 0.5, (0, 0, 255), 2)
-			print("Predicted Position: ", int(predict[0]), int(predict[1]))
-			#cv2.putText(frame, "Measured Position", (int(centers[0][0] + 15), int(centers[0][1] - 15)), 0, 0.5, (0,191,255), 2)
 			print("Estimated Position: ", int(update[0]), int(update[1]))
 			#cv2.putText(frame, "Predicted Position", (int(x + 15), int(y)), 0, 0.5, (255, 0, 0), 2)
 		
-		imgResize = cv2.resize(frame, (0, 0), None, 0.3, 0.3)
+		imgResize = cv2.resize(frame, (0, 0), None, 0.5, 0.5)
 		cv2.imshow('image', imgResize)
 	
 

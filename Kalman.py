@@ -1,14 +1,14 @@
 import numpy as np
 
 class KalmanFilter(object):
-    def __init__(self, dt, x, y, std_acc, x_std_meas, y_std_meas):
+    def __init__(self, dt, x, y, sX, sY, std_acc, x_std_meas, y_std_meas):
         self.dt = dt
 
         #Initial percepatan
-        self.a = np.matrix([[x],[y]])
+        self.a = np.matrix([[sX],[sY]])
 
         #Initial posisi dan kecepatan
-        self.i = np.matrix([[x],[y],[x],[y]])
+        self.i = np.matrix([[x],[y],[sX],[sY]])
 
         # Define the State Transition Matrix V
         self.V = np.matrix([[1, 0, self.dt, 0],
@@ -56,7 +56,7 @@ class KalmanFilter(object):
         I = np.eye(self.H.shape[1])
 
         self.P = (I - (K * self.H)) * self.P 
-        return self.n
+        return self.n[0:2]
 
 
 
